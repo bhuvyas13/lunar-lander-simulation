@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>🛰️ Satellite Landing Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+<div class="app-container">
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">🛰️</div>
+        <div>
+          <h1>Satellite Landing Simulator</h1>
+          <p class="tagline">Monte Carlo Mission Analysis & Optimization</p>
+        </div>
+      </div>
+      <div class="header-stats" id="headerStats">
+        <div class="stat-chip">
+          <span class="stat-label">Zone</span>
+          <span class="stat-value" id="currentZone">Ocean</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-label">Success Rate</span>
+          <span class="stat-value" id="currentSuccess">—</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    
+    <!-- LEFT SIDEBAR: CONTROLS -->
+    <aside class="control-sidebar">
+      <div class="sidebar-content">
+        
+        <!-- Landing Zone Selection -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">🌍</span>
+            Landing Zone
+          </h2>
+          <div class="zone-selector">
+            <label class="zone-option" data-difficulty="easy">
+              <input type="radio" name="site" value="A" id="site" checked />
+              <div class="zone-card">
+                <div class="zone-header">
+                  <span class="zone-name">Ocean Zone</span>
+                  <span class="difficulty-badge easy">Easy</span>
+                </div>
+                <div class="zone-stats">
+                  <span>🎯 Large safe zone</span>
+                  <span>💨 Low wind</span>
+                </div>
+              </div>
+            </label>
+            
+            <label class="zone-option" data-difficulty="medium">
+              <input type="radio" name="site" value="B" />
+              <div class="zone-card">
+                <div class="zone-header">
+                  <span class="zone-name">Land Zone</span>
+                  <span class="difficulty-badge medium">Medium</span>
+                </div>
+                <div class="zone-stats">
+                  <span>🎯 Medium zone</span>
+                  <span>💨 Moderate wind</span>
+                </div>
+              </div>
+            </label>
+            
+            <label class="zone-option" data-difficulty="hard">
+              <input type="radio" name="site" value="C" />
+              <div class="zone-card">
+                <div class="zone-header">
+                  <span class="zone-name">Mountain Zone</span>
+                  <span class="difficulty-badge hard">Hard</span>
+                </div>
+                <div class="zone-stats">
+                  <span>🎯 Small zone</span>
+                  <span>💨 High wind</span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- Simulation Settings -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">⚙️</span>
+            Simulation Settings
+          </h2>
+          <div class="input-group">
+            <label>Monte Carlo Runs</label>
+            <input type="number" id="n_runs" min="50" step="50" value="500" />
+          </div>
+          <div class="input-group">
+            <label>Random Seed</label>
+            <input type="number" id="seed" min="0" step="1" value="42" />
+          </div>
+        </section>
+
+        <!-- Satellite Configuration -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">🛰️</span>
+            Satellite Config
+          </h2>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Fuel (kg)</label>
+              <input type="number" id="fuel_kg" min="1" step="5" />
+            </div>
+            <div class="input-group">
+              <label>Max Thrust (N)</label>
+              <input type="number" id="max_thrust_newton" min="100" step="100" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Control System -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">🎮</span>
+            Control System
+          </h2>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Target Descent (m/s)</label>
+              <input type="number" id="target_descent_rate_mps" min="0.5" step="0.1" />
+            </div>
+            <div class="input-group">
+              <label>Controller Kp</label>
+              <input type="number" id="kp" min="0.1" step="0.1" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Environmental -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">🌪️</span>
+            Environment
+          </h2>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Wind Std (m/s²)</label>
+              <input type="number" id="wind_accel_std_mps2" min="0" step="0.01" />
+            </div>
+            <div class="input-group">
+              <label>Sensor Noise (m/s)</label>
+              <input type="number" id="vel_sensor_std_mps" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Thrust Variance</label>
+              <input type="number" id="thrust_rel_std" min="0" step="0.01" />
+            </div>
+            <div class="input-group">
+              <label>Max Time (s)</label>
+              <input type="number" id="max_time_seconds" min="10" step="10" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Safety -->
+        <section class="control-section">
+          <h2 class="section-title">
+            <span class="icon">✅</span>
+            Safety Limits
+          </h2>
+          <div class="input-group">
+            <label>Max Safe Speed (m/s)</label>
+            <input type="number" id="safe_landing_speed_mps" min="0.5" step="0.1" />
+          </div>
+        </section>
+
+        <!-- Run Button -->
+        <button id="btnRun" class="run-button">
+          <span class="btn-icon">🚀</span>
+          <span class="btn-text">Run Simulation</span>
+        </button>
+
+      </div>
+    </aside>
+
+    <!-- CENTER: MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- Simulation Viewport -->
+      <section class="sim-viewport">
+        <div class="viewport-header">
+          <h2>Mission Visualization</h2>
+          <div class="viewport-controls">
+            <button class="control-btn" id="btnPlay">▶ Play</button>
+            <button class="control-btn" id="btnPause">⏸ Pause</button>
+            <button class="control-btn" id="btnReset">↺ Reset</button>
+            <button class="control-btn secondary" id="btnNew">🎲 New Run</button>
+          </div>
+        </div>
+        
+        <div class="canvas-wrapper">
+          <canvas id="simCanvas" width="1200" height="600"></canvas>
+          <div id="warningOverlay" class="warning-overlay"></div>
+          
+          <!-- Flight Data HUD -->
+          <div class="flight-hud">
+            <div class="hud-row">
+              <span class="hud-label">Status</span>
+              <span class="hud-value" id="hudStatus">READY</span>
+            </div>
+            <div class="hud-row">
+              <span class="hud-label">Time</span>
+              <span class="hud-value" id="hudT">0.0 s</span>
+            </div>
+            <div class="hud-row">
+              <span class="hud-label">Altitude</span>
+              <span class="hud-value" id="hudAlt">— m</span>
+            </div>
+            <div class="hud-row">
+              <span class="hud-label">Velocity</span>
+              <span class="hud-value" id="hudVel">— m/s</span>
+            </div>
+            <div class="hud-row">
+              <span class="hud-label">Fuel</span>
+              <span class="hud-value" id="hudFuel">— kg</span>
+            </div>
+            <div class="hud-row">
+              <span class="hud-label">Throttle</span>
+              <span class="hud-value" id="hudThr">—</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="viewport-footer">
+          <div class="info-text">
+            <span class="icon">ℹ️</span>
+            Animation shows one representative descent from your Monte Carlo simulation
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section class="results-section">
+        <div class="results-header">
+          <h2>Mission Analysis</h2>
+        </div>
+        
+        <div id="resultsContent" class="results-content">
+          <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <h3>No Results Yet</h3>
+            <p>Configure your mission parameters and click "Run Simulation" to see detailed analysis and optimization suggestions.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: SUGGESTIONS -->
+    <aside class="suggestions-sidebar" id="suggestionsSidebar" style="display: none;">
+      <div class="sidebar-header">
+        <h2>
+          <span class="icon">💡</span>
+          Optimization Suggestions
+        </h2>
+      </div>
+      <div class="suggestions-content" id="suggestionsContent">
+        <!-- Suggestions will be populated here -->
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
