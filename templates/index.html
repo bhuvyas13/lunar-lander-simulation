@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Satellite Landing Mission Planner</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1 — PLANET SELECTION
+═══════════════════════════════════════════ -->
+<div class="page" id="page1">
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🛰️</span>
+      <span class="logo-text">MISSION PLANNER</span>
+    </div>
+    <div class="header-sub">SELECT YOUR DESTINATION</div>
+  </header>
+
+  <section class="hero-text">
+    <h1>Where will you land?</h1>
+    <p>Choose a destination. Configure your spacecraft. Run 500 Monte Carlo simulations. Conquer the cosmos.</p>
+  </section>
+
+  <div class="planets-grid" id="planetsGrid">
+    <div class="loading-planets">
+      <div class="spinner"></div>
+      <span>Loading mission data…</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2 — SITE SELECTION
+═══════════════════════════════════════════ -->
+<div class="page hidden" id="page2">
+  <header class="site-header">
+    <button class="back-btn" id="backToP1">← Back</button>
+    <div class="logo">
+      <span class="logo-icon" id="p2PlanetEmoji">🔴</span>
+      <span class="logo-text" id="p2PlanetName">MARS</span>
+    </div>
+    <div class="header-sub">SELECT LANDING SITE</div>
+  </header>
+
+  <div class="p2-layout">
+    <!-- Left: Planet info + globe visual -->
+    <div class="p2-left">
+      <div class="planet-hero" id="p2PlanetHero">
+        <div class="planet-orb" id="p2PlanetOrb"></div>
+        <div class="planet-info">
+          <div class="planet-stat"><span>Gravity</span><b id="p2Gravity">—</b></div>
+          <div class="planet-stat"><span>Atmosphere</span><b id="p2Atmosphere">—</b></div>
+          <div class="planet-stat"><span>Difficulty</span><b id="p2Difficulty">—</b></div>
+        </div>
+      </div>
+      <p class="planet-desc" id="p2Desc">—</p>
+    </div>
+
+    <!-- Right: Site list -->
+    <div class="p2-right">
+      <h2 class="sites-title">LANDING SITES</h2>
+      <div class="sites-list" id="sitesList"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 3 — MISSION CONTROL
+═══════════════════════════════════════════ -->
+<div class="page hidden" id="page3">
+  <header class="site-header">
+    <button class="back-btn" id="backToP2">← Sites</button>
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <span class="logo-text">MISSION CONTROL</span>
+    </div>
+    <div class="mission-badge" id="missionBadge">
+      <span id="badgeSite">—</span>
+    </div>
+  </header>
+
+  <div class="p3-layout">
+
+    <!-- LEFT SIDEBAR: SPACECRAFT + PARAMS -->
+    <aside class="p3-controls">
+
+      <!-- Spacecraft selection -->
+      <section class="ctrl-section">
+        <h3 class="ctrl-title"><span>🛸</span> SPACECRAFT</h3>
+        <div class="spacecraft-list" id="spacecraftList"></div>
+      </section>
+
+      <!-- Mission parameters -->
+      <section class="ctrl-section">
+        <h3 class="ctrl-title"><span>⚙️</span> PARAMETERS</h3>
+
+        <div class="param-group">
+          <label>Mass (kg)</label>
+          <input type="number" id="pMass" min="100" step="50"/>
+        </div>
+        <div class="param-row">
+          <div class="param-group">
+            <label>Fuel (kg)</label>
+            <input type="number" id="pFuel" min="1" step="10"/>
+          </div>
+          <div class="param-group">
+            <label>Max Thrust (N)</label>
+            <input type="number" id="pThrust" min="100" step="100"/>
+          </div>
+        </div>
+        <div class="param-row">
+          <div class="param-group">
+            <label>Descent Rate (m/s)</label>
+            <input type="number" id="pDescent" min="0.1" step="0.1"/>
+          </div>
+          <div class="param-group">
+            <label>Controller kp</label>
+            <input type="number" id="pKp" min="0.01" step="0.05"/>
+          </div>
+        </div>
+        <div class="param-row">
+          <div class="param-group">
+            <label>Wind Std (m/s²)</label>
+            <input type="number" id="pWind" min="0" step="0.01"/>
+          </div>
+          <div class="param-group">
+            <label>Max Time (s)</label>
+            <input type="number" id="pMaxTime" min="10" step="10"/>
+          </div>
+        </div>
+        <div class="param-group">
+          <label>Monte Carlo Runs</label>
+          <input type="number" id="pRuns" min="50" step="50" value="500"/>
+        </div>
+        <div class="param-group">
+          <label>Random Seed</label>
+          <input type="number" id="pSeed" min="0" step="1" value="42"/>
+        </div>
+      </section>
+
+      <button class="launch-btn" id="btnLaunch">
+        <span class="launch-icon">🚀</span>
+        <span class="launch-text">LAUNCH SIMULATION</span>
+      </button>
+    </aside>
+
+    <!-- CENTER: CANVAS + RESULTS -->
+    <main class="p3-main">
+
+      <!-- Viewport -->
+      <section class="viewport-section">
+        <div class="viewport-header">
+          <span class="vp-title">MISSION VISUALIZATION</span>
+          <div class="vp-controls">
+            <button class="vp-btn" id="btnPlay">▶ Play</button>
+            <button class="vp-btn" id="btnPause">⏸ Pause</button>
+            <button class="vp-btn" id="btnReset">↺ Reset</button>
+            <button class="vp-btn accent" id="btnNewRun">🎲 New Seed</button>
+          </div>
+        </div>
+
+        <div class="canvas-outer" id="canvasOuter">
+          <canvas id="simCanvas" width="900" height="520"></canvas>
+
+          <!-- Warning overlay -->
+          <div class="warning-overlay" id="warningOverlay"></div>
+
+          <!-- HUD -->
+          <div class="hud" id="hud">
+            <div class="hud-row"><span>STATUS</span><b id="hudStatus">READY</b></div>
+            <div class="hud-row"><span>TIME</span><b id="hudTime">0.0 s</b></div>
+            <div class="hud-row"><span>ALTITUDE</span><b id="hudAlt">— m</b></div>
+            <div class="hud-row"><span>VELOCITY</span><b id="hudVel">— m/s</b></div>
+            <div class="hud-row"><span>FUEL</span><b id="hudFuel">— kg</b></div>
+            <div class="hud-row"><span>THROTTLE</span><b id="hudThr">—</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results panel -->
+      <section class="results-panel" id="resultsPanel">
+        <div class="results-empty" id="resultsEmpty">
+          <div class="empty-icon">📊</div>
+          <h3>No Results Yet</h3>
+          <p>Configure your mission and click LAUNCH SIMULATION to start.</p>
+        </div>
+        <div class="results-data hidden" id="resultsData">
+          <!-- Filled by JS -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: SUGGESTIONS -->
+    <aside class="p3-suggestions hidden" id="suggestionsSidebar">
+      <div class="sugg-header">
+        <span>💡</span>
+        <h3>OPTIMIZATION SUGGESTIONS</h3>
+      </div>
+      <p class="sugg-sub" id="suggSub">—</p>
+      <div class="sugg-list" id="suggList"></div>
+    </aside>
+
+  </div>
+</div>
+
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loading-card">
+    <div class="loading-orbs">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+    </div>
+    <div class="loading-title">RUNNING MONTE CARLO</div>
+    <div class="loading-sub" id="loadingSub">Simulating 500 descent trajectories…</div>
+    <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+  </div>
+</div>
+
+<!-- IMPOSSIBLE SITE MODAL -->
+<div class="modal-overlay hidden" id="impossibleModal">
+  <div class="modal-card">
+    <div class="modal-icon">💀</div>
+    <h2 class="modal-title">IMPOSSIBLE LOCATION</h2>
+    <p class="modal-text" id="modalText">—</p>
+    <div class="modal-fact" id="modalFact">—</div>
+    <button class="modal-btn" id="modalClose">UNDERSTOOD, CHOOSE AGAIN</button>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

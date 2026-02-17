@@ -1,222 +1,88 @@
-# 🛰️ Satellite Landing Simulation
+# 🛰️ Satellite Landing Mission Planner
 
-An interactive Monte Carlo simulation for satellite landing optimization with real-time visualization and AI-powered suggestions.
+An educational Monte Carlo simulation tool for satellite landing optimization, inspired by real NASA, ISRO, ESA, and JAXA missions.
 
 ## Features
 
-✅ **Visual Landing Zones** - Color-coded safe (green), caution (yellow), and danger (red) zones  
-✅ **Real-time Warnings** - Get alerts for fuel critical, high speed, and descent issues  
-✅ **Satellite Animation** - Watch your satellite descend with realistic physics  
-✅ **Monte Carlo Analysis** - Run hundreds of simulations to test reliability  
-✅ **Smart Suggestions** - AI ranks parameter changes by tested improvement  
-✅ **Multiple Landing Sites** - Ocean (easy), Land (medium), Mountain (hard)  
+- **6 Planetary Destinations** — Moon, Mars, Earth, Titan, Asteroid Ryugu, Venus
+- **18 Landing Sites** — Real mission sites (Chandrayaan-3, Apollo 11, Perseverance, etc.)
+- **Impossible Locations** — Educational "why you can't land on Olympus Mons"
+- **9 Real Spacecraft** — From Vikram Lander to SpaceX Falcon 9
+- **500 Monte Carlo Simulations** — Statistical confidence in your mission plan
+- **Live 2D Animation** — Watch your satellite descend with realistic physics
+- **AI-Ranked Suggestions** — Each suggestion tested with real simulations
+- **Real-time HUD** — Altitude, velocity, fuel, throttle during animation
 
 ## Installation
 
-### Requirements
-- Python 3.8+
-- pip
-
-### Setup
-
-1. Install dependencies:
 ```bash
-pip install flask numpy pandas pillow --break-system-packages
+pip install flask numpy pandas --break-system-packages
 ```
 
-2. Run the application:
+## Run
+
 ```bash
 python app.py
 ```
 
-3. Open your browser:
-```
-http://127.0.0.1:5055
-```
+Open: **http://127.0.0.1:5055**
 
 ## How to Use
 
-### 1. Configure Mission Parameters
+### Step 1: Select Planet
+Choose from 6 destinations — each with different gravity, atmosphere, and challenge level.
 
-**Landing Zone Selection:**
-- **Ocean Zone** (Easy) - Larger safe zone, lower wind
-- **Land Zone** (Medium) - Medium difficulty
-- **Mountain Zone** (Hard) - Smallest safe zone, high wind
+### Step 2: Select Landing Site
+Pick from real mission sites. Click impossible locations to learn why they're dangerous.
 
-**Key Parameters:**
-- **Fuel (kg)** - More fuel = longer burn time
-- **Max Thrust (N)** - Higher thrust = better control
-- **Target Descent Rate (m/s)** - Speed you're trying to maintain
-- **Controller kp** - Response sensitivity (higher = more aggressive)
+### Step 3: Configure Mission
+- Select a real spacecraft (pre-fills realistic parameters)
+- Adjust fuel, thrust, descent rate, controller gain
+- Set Monte Carlo runs (500 recommended)
 
-### 2. Run Simulation
+### Step 4: Launch Simulation
+Watch 500 simulations run. See success rate, failure analysis, and AI-ranked improvements.
 
-Click **"🚀 Run Simulation"** to execute Monte Carlo analysis.
+### Step 5: Optimize
+Click "Apply This Change" on any suggestion. Parameters update automatically.
 
-### 3. Analyze Results
+## Physics
 
-**Results Panel Shows:**
-- ✅ **Safe landing rate** - % of successful landings
-- 🎯 **Touchdown rate** - % that reached the surface
-- 📊 **Breakdown** - What went wrong in failed attempts
-
-**Common Failure Modes:**
-- ⚠️ **Out of Fuel** - Increase fuel or thrust, descend faster
-- ⚠️ **Too Fast** - Increase thrust or slow descent rate
-- ⏱️ **Time Limit** - Increase max time or descend faster
-
-### 4. Watch Animation
-
-Control the satellite landing visualization:
-- **▶ Play** - Start descent animation
-- **⏸ Pause** - Freeze current state
-- **↺ Reset** - Return to start
-- **🎲 New Run** - Generate new random scenario
-
-**Visual Indicators:**
-- Green zones = Safe landing area
-- Yellow zones = Caution zone
-- Red zones = High-risk area
-- Flame intensity = Thrust level
-- Warning badges = Real-time alerts
-
-### 5. Apply Suggestions
-
-The system automatically tests parameter changes and ranks them by improvement:
-
-1. Review ranked suggestions (sorted by effectiveness)
-2. Click **"Apply Change"** on any suggestion
-3. Parameters update automatically
-4. Run simulation again to verify improvement
-
-## Understanding the Physics
-
-### Descent Dynamics
 ```
 Acceleration = (Thrust / Mass) - Gravity + Wind
-Velocity += Acceleration × dt
-Altitude += Velocity × dt
+Velocity    += Acceleration × dt
+Altitude    += Velocity × dt
 ```
 
-### Control System
-The satellite uses a proportional controller:
+Controller:
 ```
-Error = Target_Velocity - Measured_Velocity
+Error    = Target_Velocity - Measured_Velocity
 Throttle = kp × Error
 ```
-
-**kp Parameter Guide:**
-- `kp = 0.5` - Gentle, slow response
-- `kp = 0.8` - Balanced (default)
-- `kp = 1.2` - Aggressive, fast response
-
-### Safe Landing Criteria
-- ✅ Touchdown velocity ≤ Safe speed threshold
-- ✅ Landing within designated zones (bonus points for green zone)
-- ✅ Fuel remaining > 0
-
-## Tips for Success
-
-### Starting Out
-1. Begin with Ocean Zone (easiest)
-2. Use default parameters first
-3. Run 500+ simulations for reliable stats
-4. Watch the animation to understand behavior
-
-### Optimization Strategy
-1. **If running out of fuel:**
-   - Increase fuel capacity
-   - Increase max thrust
-   - Increase descent rate (land faster)
-
-2. **If landing too fast:**
-   - Decrease target descent rate
-   - Increase max thrust
-   - Increase kp for more responsive control
-
-3. **If hitting time limit:**
-   - Increase max_time parameter
-   - Increase descent rate
-
-### Advanced Tuning
-- **Low kp (0.4-0.6)** - Smooth but may be too slow
-- **Medium kp (0.7-1.0)** - Balanced performance
-- **High kp (1.1-1.5)** - Very responsive but may oscillate
 
 ## File Structure
 
 ```
-satellite_landing/
-├── app.py              # Flask backend + simulation engine
-├── config.json         # Default parameters
+satellite_planner/
+├── app.py                    # Flask backend + simulation engine
+├── requirements.txt
+├── data/
+│   ├── locations.json        # 6 planets × 18 sites
+│   └── spacecraft_reference.json  # 9 real spacecraft
 ├── templates/
-│   └── index.html      # Main UI
-├── static/
-│   ├── styles.css      # Styling
-│   ├── app.js          # Frontend logic + animation
-│   └── assets/
-│       └── satellite.png  # Satellite sprite
+│   └── index.html           # Single-page app (3 views)
+└── static/
+    ├── css/styles.css       # Space-themed dark UI
+    └── js/app.js            # All frontend logic + canvas animation
 ```
 
-## Customization
+## Landing Sites by Planet
 
-### Change Satellite Image
-Replace `static/assets/satellite.png` with your own image (120x120px recommended)
-
-### Modify Landing Zones
-Edit `LANDING_ZONES` in `app.py`:
-```python
-"safe_zone": {"x": 450, "y": 380, "radius": 80, "color": "#4ade80"}
-```
-
-### Add New Suggestions
-Extend `candidate_patches()` in `app.py`:
-```python
-def candidate_patches(cfg, dominant_reason):
-    # Add your custom suggestion
-    add("Your change name", {"satellite.fuel_kg": new_value})
-```
-
-## Troubleshooting
-
-**Simulation won't run:**
-- Check Python 3.8+ is installed
-- Verify all dependencies installed
-- Check console for errors
-
-**Animation not showing:**
-- Verify satellite.png exists in static/assets/
-- Check browser console for errors
-- Try refreshing the page
-
-**Poor performance:**
-- Reduce Monte Carlo runs (try 200-300)
-- Close other browser tabs
-- Use a modern browser (Chrome/Firefox/Safari)
-
-## Technical Details
-
-**Monte Carlo Method:**
-- Runs N independent simulations with random noise
-- Aggregates results for statistical confidence
-- Each simulation uses different random seed
-
-**Suggestion Ranking:**
-- Tests each parameter change with 120-250 quick runs
-- Calculates improvement delta vs baseline
-- Ranks by effectiveness (highest improvement first)
-
-**Physics Accuracy:**
-- 0.1 second timestep (configurable)
-- Includes gravity, thrust, wind, sensor noise
-- Proportional controller for descent rate
-
-## License
-
-This project is for educational and research purposes.
-
----
-
-**Need Help?** Check the console logs or adjust parameters incrementally to understand their effects.
-
-**Pro Tip:** The best way to learn is to intentionally fail (set fuel=10) and watch what happens, then use suggestions to fix it!
+| Planet | Sites | Real Missions |
+|--------|-------|---------------|
+| 🌙 Moon | 4 | Chandrayaan-3, Apollo 11, Artemis |
+| 🔴 Mars | 5 | Curiosity, Perseverance, InSight |
+| 🌍 Earth | 4 | SpaceX Falcon 9 drone ship |
+| 🪐 Titan | 2 | Huygens probe, Dragonfly |
+| ☄️ Asteroid | 1 | Hayabusa2 |
+| 🟡 Venus | 2 | Venera 7 |
