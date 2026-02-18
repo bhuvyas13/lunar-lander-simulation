@@ -5,7 +5,7 @@
     "runs_monte_carlo": 500,
     "seed": 42
   },
-  "satellite": {
+  "lander": {
     "mass_kg": 1200,
     "initial_altitude_m": 500,
     "initial_velocity_mps": 0,
@@ -23,6 +23,7 @@
     "max_throttle": 1.0
   },
   "noise": {
+    "altimeter_std_m": 0.5,
     "vel_sensor_std_mps": 0.08,
     "thrust_rel_std": 0.02
   },
